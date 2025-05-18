@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Graphical Chess Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 30px;
+    }
+
+    .chess-board {
+      display: grid;
+      grid-template-columns: repeat(8, 60px);
+      grid-template-rows: repeat(8, 60px);
+      border: 2px solid #333;
+    }
+
+    .square {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .light {
+      background-color: #f0d9b5;
+    }
+
+    .dark {
+      background-color: #b58863;
+    }
+
+    .piece {
+      width: 40px;
+      height: 40px;
+      background-size: cover;
+      cursor: pointer;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="chess-board" id="chessBoard"></div>
+  <button onclick="restartGame()">Restart Game</button>
+
+  <script>
+    const board = [
+      ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
+      ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+      ['.', '.', '.', '.', '.', '.', '.', '.'],
+      ['.', '.', '.', '.', '.', '.', '.', '.'],
+      ['.', '.', '.', '.', '.', '.', '.', '.'],
+      ['.', '.', '.', '.', '.', '.', '.', '.'],
+      ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
+      ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+    ];
+
+    let selectedPiece = null;
+
+    const pieceImages = {
+      'K': 'https://upload.wikimedia.org/wikipedia/commons/4/42/Chess_khl.svg',
+      'k': 'https://upload.wikimedia.org/wikipedia/commons/5/56/Chess_klt45.svg',
+      'P': 'https://upload.wikimedia.org/wikipedia/commons/4/45/Chess_plt45.svg',
+      'p': 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Chess_pdt45.svg',
+      'R': 'https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg',
+      'r': 'https://upload.wikimedia.org/wikipedia/commons/f/ff/Chess_rdt45.svg',
+      'N': 'https://upload.wikimedia.org/wikipedia/commons/7/70/Chess_nlt45.svg',
+      'n': 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Chess_ndt45.svg',
+      'B': 'https://upload.wikimedia.org/wikipedia/commons/b/b1/Chess_blt45.svg',
+      'b': 'https://upload.wikimedia.org/wikipedia/commons/9/98/Chess_bdt45.svg',
+      'Q': 'https://upload.wikimedia.org/wikipedia/commons/1/15/Chess_qlt45.svg',
+      'q': 'https://upload.wikimedia.org/wikipedia/commons/4/47/Chess_qdt45.svg',
+    };
+
+    function createBoard() {
+      const chessBoard = document.getElementById('chessBoard');
+      chessBoard.innerHTML = '';
+
+      for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+          const square = document.createElement('div');
+          square.classList.add('square');
+          square.classList.add((row + col) % 2 === 0 ? 'light' : 'dark');
+          square.dataset.row = row;
+          square.dataset.col = col;
+
+          const piece = board[row][col];
+          if (piece !== '.') {
+            const pieceDiv = document.createElement('div');
+            pieceDiv.classList.add('piece');
+            pieceDiv.style.backgroundImage = `url(${pieceImages[piece]})`;
+            pieceDiv.dataset.piece = piece;
+            pieceDiv.addEventListener('click', selectPiece);
+            square.appendChild(pieceDiv);
+          }
+
+          chessBoard.appendChild(square);
+        }
+      }
+    }
+
+    function selectPiece(event) {
+      const square = event.target.closest('.square');
+      const row = parseInt(square.dataset.row);
+      const col = parseInt(square.dataset.col);
+      const piece = board[row][col];
+
+      if (selectedPiece) {
+        const selectedRow = parseInt(selectedPiece.dataset.row);
+        const selectedCol = parseInt(selectedPiece.dataset.col);
+
+        if (selectedRow !== row || selectedCol !== col) {
+          movePiece(selectedRow, selectedCol, row, col);
+        }
+
+        selectedPiece = null;
+      } else {
+        if (piece !== '.') {
+          selectedPiece = square;
+        }
+      }
+    }
+
+    function movePiece(fromRow, fromCol, toRow, toCol) {
+      const piece = board[fromRow][fromCol];
+      board[toRow][toCol] = piece;
+      board[fromRow][fromCol] = '.';
+      createBoard();
+    }
+
+    function restartGame() {
+      board.length = 0;
+      board.push(
+        ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
+        ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+        ['.', '.', '.', '.', '.', '.', '.', '.'],
+        ['.', '.', '.', '.', '.', '.', '.', '.'],
+        ['.', '.', '.', '.', '.', '.', '.', '.'],
+        ['.', '.', '.', '.', '.', '.', '.', '.'],
+        ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
+        ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
+      );
+      createBoard();
+    }
+
+    createBoard();
+  </script>
+
+</body>
+</html>
